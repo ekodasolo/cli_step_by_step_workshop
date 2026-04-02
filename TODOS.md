@@ -24,10 +24,10 @@
 
 ## フェーズ 4: ハンズオン手順書（アプリケーション編）
 
-- [ ] docs/hands-on/05-step05-iam.md 作成
-- [ ] docs/hands-on/06-step06-ec2.md 作成
-- [ ] docs/hands-on/07-step07-alb.md 作成
-- [ ] docs/hands-on/08-step08-asg.md 作成
+- [x] docs/hands-on/05-step05-iam.md 作成
+- [x] docs/hands-on/06-step06-ec2.md 作成
+- [x] docs/hands-on/07-step07-alb.md 作成
+- [x] docs/hands-on/08-step08-asg.md 作成
 
 ## フェーズ 5: クリーンアップ・講師用資料
 
