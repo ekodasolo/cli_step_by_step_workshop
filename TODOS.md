@@ -31,8 +31,8 @@
 
 ## フェーズ 5: クリーンアップ・講師用資料
 
-- [ ] docs/hands-on/09-step09-cleanup.md 作成
-- [ ] app/generate-page.sh 作成（CFn 版からコピー・タイトル変更）
-- [ ] scripts/create-all.sh 作成（講師用一括作成スクリプト）
-- [ ] scripts/cleanup-all.sh 作成（講師用一括削除スクリプト）
-- [ ] docs/instructor-guide.md 作成（講師ガイド）
+- [x] docs/hands-on/09-step09-cleanup.md 作成
+- [x] app/generate-page.sh 作成（CFn 版からコピー・タイトル変更）
+- [x] scripts/create-all.sh 作成（講師用一括作成スクリプト）
+- [x] scripts/cleanup-all.sh 作成（講師用一括削除スクリプト）
+- [x] docs/instructor-guide.md 作成（講師ガイド）
