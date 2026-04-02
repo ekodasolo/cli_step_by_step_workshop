@@ -3,23 +3,47 @@
 # 手順書の内容を自動実行する。デモ環境の事前準備や動作確認に使用。
 set -euo pipefail
 
+# --- env ファイル読み込み ---
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ENV_FILE="${SCRIPT_DIR}/workshop.env"
+
+if [ ! -f "${ENV_FILE}" ]; then
+    echo "エラー: ${ENV_FILE} が見つかりません。"
+    exit 1
+fi
+
+source "${ENV_FILE}"
+
+# --- env から導出されるリソース名（固定ロジック） ---
+VPC_NAME="${PROJECT_NAME}-vpc"
+SUBNET_1A_NAME="${PROJECT_NAME}-public-1a"
+SUBNET_1C_NAME="${PROJECT_NAME}-public-1c"
+IGW_NAME="${PROJECT_NAME}-igw"
+RT_NAME="${PROJECT_NAME}-public-rt"
+ALB_SG_NAME="${PROJECT_NAME}-alb-sg"
+WEB_SG_NAME="${PROJECT_NAME}-web-sg"
+ROLE_NAME="${PROJECT_NAME}-web-server-role"
+INSTANCE_PROFILE_NAME="${PROJECT_NAME}-web-server-profile"
+INSTANCE_NAME="${PROJECT_NAME}-web-server"
+ALB_NAME="${PROJECT_NAME}-alb"
+TG_NAME="${PROJECT_NAME}-tg"
+LT_NAME="${PROJECT_NAME}-lt"
+ASG_NAME="${PROJECT_NAME}-asg"
+
 echo "=============================="
 echo " CLI Workshop - 一括作成"
 echo "=============================="
-
-# --- 共通パラメータ ---
-AWS_REGION="ap-northeast-1"
-VPC_CIDR="10.0.0.0/16"
-SUBNET_1A_CIDR="10.0.1.0/24"
-SUBNET_1C_CIDR="10.0.2.0/24"
-INSTANCE_TYPE="t2.micro"
+echo " PROJECT_NAME: ${PROJECT_NAME}"
+echo " AWS_REGION:   ${AWS_REGION}"
+echo " VPC_CIDR:     ${VPC_CIDR}"
+echo "=============================="
 
 # --- Step 01: VPC ---
 echo ""
 echo "[Step 01] VPC を作成..."
 VPC_ID=$(aws ec2 create-vpc \
     --cidr-block ${VPC_CIDR} \
-    --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=cli-workshop-vpc}]' \
+    --tag-specifications "ResourceType=vpc,Tags=[{Key=Name,Value=${VPC_NAME}}]" \
     --query "Vpc.VpcId" \
     --region ${AWS_REGION} \
     --output text) && echo "  VPC_ID=${VPC_ID}"
@@ -36,8 +60,8 @@ echo "[Step 02] Subnet を作成..."
 SUBNET_1A_ID=$(aws ec2 create-subnet \
     --vpc-id ${VPC_ID} \
     --cidr-block ${SUBNET_1A_CIDR} \
-    --availability-zone ap-northeast-1a \
-    --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=cli-workshop-public-1a}]' \
+    --availability-zone ${SUBNET_1A_AZ} \
+    --tag-specifications "ResourceType=subnet,Tags=[{Key=Name,Value=${SUBNET_1A_NAME}}]" \
     --query "Subnet.SubnetId" \
     --region ${AWS_REGION} \
     --output text) && echo "  SUBNET_1A_ID=${SUBNET_1A_ID}"
@@ -50,8 +74,8 @@ aws ec2 modify-subnet-attribute \
 SUBNET_1C_ID=$(aws ec2 create-subnet \
     --vpc-id ${VPC_ID} \
     --cidr-block ${SUBNET_1C_CIDR} \
-    --availability-zone ap-northeast-1c \
-    --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=cli-workshop-public-1c}]' \
+    --availability-zone ${SUBNET_1C_AZ} \
+    --tag-specifications "ResourceType=subnet,Tags=[{Key=Name,Value=${SUBNET_1C_NAME}}]" \
     --query "Subnet.SubnetId" \
     --region ${AWS_REGION} \
     --output text) && echo "  SUBNET_1C_ID=${SUBNET_1C_ID}"
@@ -65,7 +89,7 @@ aws ec2 modify-subnet-attribute \
 echo ""
 echo "[Step 03] IGW + RouteTable を作成..."
 IGW_ID=$(aws ec2 create-internet-gateway \
-    --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=cli-workshop-igw}]' \
+    --tag-specifications "ResourceType=internet-gateway,Tags=[{Key=Name,Value=${IGW_NAME}}]" \
     --query "InternetGateway.InternetGatewayId" \
     --region ${AWS_REGION} \
     --output text) && echo "  IGW_ID=${IGW_ID}"
@@ -77,7 +101,7 @@ aws ec2 attach-internet-gateway \
 
 RT_ID=$(aws ec2 create-route-table \
     --vpc-id ${VPC_ID} \
-    --tag-specifications 'ResourceType=route-table,Tags=[{Key=Name,Value=cli-workshop-public-rt}]' \
+    --tag-specifications "ResourceType=route-table,Tags=[{Key=Name,Value=${RT_NAME}}]" \
     --query "RouteTable.RouteTableId" \
     --region ${AWS_REGION} \
     --output text) && echo "  RT_ID=${RT_ID}"
@@ -103,10 +127,10 @@ echo "  ルーティング設定完了"
 echo ""
 echo "[Step 04] Security Group を作成..."
 ALB_SG_ID=$(aws ec2 create-security-group \
-    --group-name cli-workshop-alb-sg \
+    --group-name ${ALB_SG_NAME} \
     --description "Security group for ALB - allows HTTP from internet" \
     --vpc-id ${VPC_ID} \
-    --tag-specifications 'ResourceType=security-group,Tags=[{Key=Name,Value=cli-workshop-alb-sg}]' \
+    --tag-specifications "ResourceType=security-group,Tags=[{Key=Name,Value=${ALB_SG_NAME}}]" \
     --query "GroupId" \
     --region ${AWS_REGION} \
     --output text) && echo "  ALB_SG_ID=${ALB_SG_ID}"
@@ -119,10 +143,10 @@ aws ec2 authorize-security-group-ingress \
     --region ${AWS_REGION} > /dev/null
 
 WEB_SG_ID=$(aws ec2 create-security-group \
-    --group-name cli-workshop-web-sg \
+    --group-name ${WEB_SG_NAME} \
     --description "Security group for EC2 - allows HTTP from ALB only" \
     --vpc-id ${VPC_ID} \
-    --tag-specifications 'ResourceType=security-group,Tags=[{Key=Name,Value=cli-workshop-web-sg}]' \
+    --tag-specifications "ResourceType=security-group,Tags=[{Key=Name,Value=${WEB_SG_NAME}}]" \
     --query "GroupId" \
     --region ${AWS_REGION} \
     --output text) && echo "  WEB_SG_ID=${WEB_SG_ID}"
@@ -137,8 +161,6 @@ aws ec2 authorize-security-group-ingress \
 # --- Step 05: IAM ---
 echo ""
 echo "[Step 05] IAM Role + Instance Profile を作成..."
-ROLE_NAME="cli-workshop-web-server-role"
-INSTANCE_PROFILE_NAME="cli-workshop-web-server-profile"
 
 cat << 'EOF' > /tmp/trust-policy.json
 {
@@ -187,7 +209,6 @@ AMI_ID=$(aws ssm get-parameters \
     --output text) && echo "  AMI_ID=${AMI_ID}"
 
 # --- UserData 作成 ---
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cat << 'USERDATA' > /tmp/userdata.sh
 #!/bin/bash
 set -euo pipefail
@@ -259,12 +280,12 @@ USERDATA
 echo ""
 echo "[Step 07] ALB + Target Group + Listener を作成..."
 ALB_ARN=$(aws elbv2 create-load-balancer \
-    --name cli-workshop-alb \
+    --name ${ALB_NAME} \
     --subnets ${SUBNET_1A_ID} ${SUBNET_1C_ID} \
     --security-groups ${ALB_SG_ID} \
     --scheme internet-facing \
     --type application \
-    --tags Key=Name,Value=cli-workshop-alb \
+    --tags Key=Name,Value=${ALB_NAME} \
     --query "LoadBalancers[].LoadBalancerArn" \
     --region ${AWS_REGION} \
     --output text) && echo "  ALB_ARN=${ALB_ARN}"
@@ -276,7 +297,7 @@ aws elbv2 wait load-balancer-available \
 echo "  ALB 利用可能"
 
 TG_ARN=$(aws elbv2 create-target-group \
-    --name cli-workshop-tg \
+    --name ${TG_NAME} \
     --protocol HTTP \
     --port 80 \
     --vpc-id ${VPC_ID} \
@@ -286,7 +307,7 @@ TG_ARN=$(aws elbv2 create-target-group \
     --health-check-interval-seconds 30 \
     --healthy-threshold-count 2 \
     --unhealthy-threshold-count 5 \
-    --tags Key=Name,Value=cli-workshop-tg \
+    --tags Key=Name,Value=${TG_NAME} \
     --query "TargetGroups[].TargetGroupArn" \
     --region ${AWS_REGION} \
     --output text) && echo "  TG_ARN=${TG_ARN}"
@@ -305,7 +326,7 @@ echo "[Step 08] Launch Template + ASG を作成..."
 USERDATA_BASE64=$(base64 -w 0 /tmp/userdata.sh)
 
 LT_ID=$(aws ec2 create-launch-template \
-    --launch-template-name cli-workshop-lt \
+    --launch-template-name ${LT_NAME} \
     --launch-template-data "{
         \"ImageId\": \"${AMI_ID}\",
         \"InstanceType\": \"${INSTANCE_TYPE}\",
@@ -317,7 +338,7 @@ LT_ID=$(aws ec2 create-launch-template \
         \"TagSpecifications\": [
             {
                 \"ResourceType\": \"instance\",
-                \"Tags\": [{\"Key\": \"Name\", \"Value\": \"cli-workshop-web-server\"}]
+                \"Tags\": [{\"Key\": \"Name\", \"Value\": \"${INSTANCE_NAME}\"}]
             }
         ]
     }" \
@@ -326,11 +347,11 @@ LT_ID=$(aws ec2 create-launch-template \
     --output text) && echo "  LT_ID=${LT_ID}"
 
 aws autoscaling create-auto-scaling-group \
-    --auto-scaling-group-name cli-workshop-asg \
+    --auto-scaling-group-name ${ASG_NAME} \
     --launch-template LaunchTemplateId=${LT_ID},Version='$Default' \
-    --min-size 2 \
-    --max-size 4 \
-    --desired-capacity 2 \
+    --min-size ${ASG_MIN_SIZE} \
+    --max-size ${ASG_MAX_SIZE} \
+    --desired-capacity ${ASG_DESIRED_CAPACITY} \
     --vpc-zone-identifier "${SUBNET_1A_ID},${SUBNET_1C_ID}" \
     --target-group-arns ${TG_ARN} \
     --health-check-type ELB \
@@ -342,7 +363,7 @@ rm -f /tmp/userdata.sh
 
 # --- 完了 ---
 ALB_DNS=$(aws elbv2 describe-load-balancers \
-    --names cli-workshop-alb \
+    --names ${ALB_NAME} \
     --query "LoadBalancers[].DNSName" \
     --region ${AWS_REGION} \
     --output text)

@@ -3,12 +3,37 @@
 # 依存関係の逆順で削除する。
 set -euo pipefail
 
+# --- env ファイル読み込み ---
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ENV_FILE="${SCRIPT_DIR}/workshop.env"
+
+if [ ! -f "${ENV_FILE}" ]; then
+    echo "エラー: ${ENV_FILE} が見つかりません。"
+    exit 1
+fi
+
+source "${ENV_FILE}"
+
+# --- env から導出されるリソース名（固定ロジック） ---
+ALB_SG_NAME="${PROJECT_NAME}-alb-sg"
+WEB_SG_NAME="${PROJECT_NAME}-web-sg"
+RT_NAME="${PROJECT_NAME}-public-rt"
+SUBNET_1A_NAME="${PROJECT_NAME}-public-1a"
+SUBNET_1C_NAME="${PROJECT_NAME}-public-1c"
+ROLE_NAME="${PROJECT_NAME}-web-server-role"
+INSTANCE_PROFILE_NAME="${PROJECT_NAME}-web-server-profile"
+ALB_NAME="${PROJECT_NAME}-alb"
+TG_NAME="${PROJECT_NAME}-tg"
+LT_NAME="${PROJECT_NAME}-lt"
+ASG_NAME="${PROJECT_NAME}-asg"
+
 echo "=============================="
 echo " CLI Workshop - 一括削除"
 echo "=============================="
-
-AWS_REGION="ap-northeast-1"
-VPC_CIDR="10.0.0.0/16"
+echo " PROJECT_NAME: ${PROJECT_NAME}"
+echo " AWS_REGION:   ${AWS_REGION}"
+echo " VPC_CIDR:     ${VPC_CIDR}"
+echo "=============================="
 
 # --- ID 取得 ---
 echo ""
@@ -29,7 +54,7 @@ echo "  VPC_ID=${VPC_ID}"
 # --- Step 1: ASG 削除 ---
 echo ""
 echo "[1/11] Auto Scaling Group を削除..."
-ASG_NAME="cli-workshop-asg"
+# ASG_NAME は env から導出済み
 if aws autoscaling describe-auto-scaling-groups \
     --auto-scaling-group-names ${ASG_NAME} \
     --query "AutoScalingGroups[].AutoScalingGroupName" \
@@ -64,7 +89,7 @@ fi
 # --- Step 2: Launch Template 削除 ---
 echo ""
 echo "[2/11] Launch Template を削除..."
-LT_NAME="cli-workshop-lt"
+# LT_NAME は env から導出済み
 LT_ID=$(aws ec2 describe-launch-templates \
     --launch-template-names ${LT_NAME} \
     --query "LaunchTemplates[].LaunchTemplateId" \
@@ -82,7 +107,7 @@ fi
 # --- Step 3: ALB Listener 削除 ---
 echo ""
 echo "[3/11] ALB Listener を削除..."
-ALB_NAME="cli-workshop-alb"
+# ALB_NAME は env から導出済み
 ALB_ARN=$(aws elbv2 describe-load-balancers \
     --names ${ALB_NAME} \
     --query "LoadBalancers[].LoadBalancerArn" \
@@ -123,7 +148,7 @@ fi
 # --- Step 5: Target Group 削除 ---
 echo ""
 echo "[5/11] Target Group を削除..."
-TG_NAME="cli-workshop-tg"
+# TG_NAME は env から導出済み
 TG_ARN=$(aws elbv2 describe-target-groups \
     --names ${TG_NAME} \
     --query "TargetGroups[].TargetGroupArn" \
@@ -165,8 +190,7 @@ fi
 # --- Step 7: IAM 削除 ---
 echo ""
 echo "[7/11] IAM を削除..."
-ROLE_NAME="cli-workshop-web-server-role"
-INSTANCE_PROFILE_NAME="cli-workshop-web-server-profile"
+# ROLE_NAME, INSTANCE_PROFILE_NAME は env から導出済み
 
 if aws iam get-instance-profile --instance-profile-name ${INSTANCE_PROFILE_NAME} 2>/dev/null; then
     aws iam remove-role-from-instance-profile \
@@ -194,7 +218,7 @@ fi
 echo ""
 echo "[8/11] Security Group を削除..."
 WEB_SG_ID=$(aws ec2 describe-security-groups \
-    --filters "Name=vpc-id,Values=${VPC_ID}" "Name=group-name,Values=cli-workshop-web-sg" \
+    --filters "Name=vpc-id,Values=${VPC_ID}" "Name=group-name,Values=${WEB_SG_NAME}" \
     --query "SecurityGroups[].GroupId" \
     --region ${AWS_REGION} \
     --output text 2>/dev/null) || true
@@ -204,7 +228,7 @@ if [ -n "${WEB_SG_ID}" ]; then
 fi
 
 ALB_SG_ID=$(aws ec2 describe-security-groups \
-    --filters "Name=vpc-id,Values=${VPC_ID}" "Name=group-name,Values=cli-workshop-alb-sg" \
+    --filters "Name=vpc-id,Values=${VPC_ID}" "Name=group-name,Values=${ALB_SG_NAME}" \
     --query "SecurityGroups[].GroupId" \
     --region ${AWS_REGION} \
     --output text 2>/dev/null) || true
@@ -217,7 +241,7 @@ fi
 echo ""
 echo "[9/11] Route Table を削除..."
 RT_ID=$(aws ec2 describe-route-tables \
-    --filters "Name=vpc-id,Values=${VPC_ID}" "Name=tag:Name,Values=cli-workshop-public-rt" \
+    --filters "Name=vpc-id,Values=${VPC_ID}" "Name=tag:Name,Values=${RT_NAME}" \
     --query "RouteTables[].RouteTableId" \
     --region ${AWS_REGION} \
     --output text 2>/dev/null) || true
@@ -259,7 +283,7 @@ fi
 # --- Step 11: Subnets + VPC 削除 ---
 echo ""
 echo "[11/11] Subnet + VPC を削除..."
-for SUBNET_NAME in cli-workshop-public-1a cli-workshop-public-1c; do
+for SUBNET_NAME in ${SUBNET_1A_NAME} ${SUBNET_1C_NAME}; do
     SUBNET_ID=$(aws ec2 describe-subnets \
         --filters "Name=vpc-id,Values=${VPC_ID}" "Name=tag:Name,Values=${SUBNET_NAME}" \
         --query "Subnets[].SubnetId" \
