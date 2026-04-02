@@ -11,16 +11,16 @@
 
 ## フェーズ 2: イントロダクション・設計ドキュメント
 
-- [ ] docs/introduction.md 作成（Bash 基礎 + AWS CLI 基礎）
-- [ ] docs/cli-workshop-outline.md 作成（ワークショップ設計書）
-- [ ] docs/hands-on/00-overview.md 作成（全体概要・ナビゲーション）
+- [x] docs/introduction.md 作成（Bash 基礎 + AWS CLI 基礎）
+- [x] docs/cli-workshop-outline.md 作成（ワークショップ設計書）
+- [x] docs/hands-on/00-overview.md 作成（全体概要・ナビゲーション）
 
 ## フェーズ 3: ハンズオン手順書（ネットワーク編）
 
-- [ ] docs/hands-on/01-step01-vpc.md 作成
-- [ ] docs/hands-on/02-step02-subnets.md 作成
-- [ ] docs/hands-on/03-step03-igw-routes.md 作成
-- [ ] docs/hands-on/04-step04-sg.md 作成
+- [x] docs/hands-on/01-step01-vpc.md 作成
+- [x] docs/hands-on/02-step02-subnets.md 作成
+- [x] docs/hands-on/03-step03-igw-routes.md 作成
+- [x] docs/hands-on/04-step04-sg.md 作成
 
 ## フェーズ 4: ハンズオン手順書（アプリケーション編）
 
