@@ -105,7 +105,7 @@ vi scripts/workshop.env
 
 ## 姉妹ワークショップ
 
-このワークショップは [CloudFormation ワークショップ](../cfn_workshop/) と同一の最終構成を、異なるツールで構築する姉妹編です。
+このワークショップは [CloudFormation ワークショップ](https://github.com/ekodasolo/cfn_step_by_step_workshop) と同一の最終構成を、異なるツールで構築する姉妹編です。
 
 | | CFn ワークショップ | CLI ワークショップ（本リポジトリ） |
 |---|---|---|
