@@ -44,7 +44,7 @@ AWS CLI を使って、以下のインフラ構成を **1 リソースずつ手�
 JSON の構文ミスを防ぐため、バリデーションツール `jsonlint` をインストールしておきます。
 
 ```bash
-npm install -g jsonlint
+sudo npm install -g jsonlint
 ```
 
 インストールを確認する。
