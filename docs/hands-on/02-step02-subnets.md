@@ -372,7 +372,7 @@ aws ec2 create-subnet \
     --vpc-id ${VPC_ID} \
     --cidr-block ${SUBNET_CIDR} \
     --availability-zone ${SUBNET_AZ} \
-    --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=${SUBNET_NAME}}]' \
+    --tag-specifications "ResourceType=subnet,Tags=[{Key=Name,Value=${SUBNET_NAME}}]" \
     --region ${AWS_REGION}
 
 EOF
@@ -386,7 +386,7 @@ aws ec2 create-subnet \
     --vpc-id ${VPC_ID} \
     --cidr-block ${SUBNET_CIDR} \
     --availability-zone ${SUBNET_AZ} \
-    --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=${SUBNET_NAME}}]' \
+    --tag-specifications "ResourceType=subnet,Tags=[{Key=Name,Value=${SUBNET_NAME}}]" \
     --region ${AWS_REGION}
 ```
 
