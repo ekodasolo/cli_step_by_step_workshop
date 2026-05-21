@@ -640,9 +640,10 @@ ASG_INSTANCE_IDS=$(aws autoscaling describe-auto-scaling-groups \
     --auto-scaling-group-names ${ASG_NAME} \
     --query "AutoScalingGroups[].Instances[].InstanceId" \
     --region ${AWS_REGION} \
-    --output text)
-echo "ASG インスタンス: ${ASG_INSTANCE_IDS}"
+    --output text) && echo "ASG インスタンス: ${ASG_INSTANCE_IDS}"
+```
 
+```bash
 # 全web-serverインスタンスからASG管理分を除外
 STANDALONE_INSTANCE_ID=$(aws ec2 describe-instances \
     --filters \
