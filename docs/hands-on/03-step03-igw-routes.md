@@ -99,7 +99,7 @@ aws ec2 describe-internet-gateways \
 ```bash
 cat << EOF > ${FILE_PARAMETER}
 aws ec2 create-internet-gateway \
-    --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=${IGW_NAME}}]' \
+    --tag-specifications "ResourceType=internet-gateway,Tags=[{Key=Name,Value=${IGW_NAME}}]" \
     --region ${AWS_REGION}
 
 EOF
@@ -110,7 +110,7 @@ IGW を作成する。
 
 ```bash
 aws ec2 create-internet-gateway \
-    --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=${IGW_NAME}}]' \
+    --tag-specifications "ResourceType=internet-gateway,Tags=[{Key=Name,Value=${IGW_NAME}}]" \
     --region ${AWS_REGION}
 ```
 
