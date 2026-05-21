@@ -99,7 +99,7 @@ aws ec2 describe-vpcs \
 cat << EOF > ${FILE_PARAMETER}
 aws ec2 create-vpc \
     --cidr-block ${VPC_CIDR} \
-    --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=${VPC_NAME}}]' \
+    --tag-specifications "ResourceType=vpc,Tags=[{Key=Name,Value=${VPC_NAME}}]" \
     --region ${AWS_REGION}
 
 EOF
@@ -111,7 +111,7 @@ VPC を作成する。
 ```bash
 aws ec2 create-vpc \
     --cidr-block ${VPC_CIDR} \
-    --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=${VPC_NAME}}]' \
+    --tag-specifications "ResourceType=vpc,Tags=[{Key=Name,Value=${VPC_NAME}}]" \
     --region ${AWS_REGION}
 ```
 
