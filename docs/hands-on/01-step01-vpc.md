@@ -62,14 +62,18 @@ ETX
 CloudShell にログイン済みで、リージョンが `ap-northeast-1` になっていることを確認する。
 
 ```bash
-aws configure get region
+aws configure list
 ```
 
 ```output
-ap-northeast-1
+NAME       : VALUE                    : TYPE             : LOCATION
+profile    : <not set>                : None             : None
+access_key : ****************47GR     : container-role   : 
+secret_key : ****************hF6V     : container-role   : 
+region     : ap-northeast-1           : env              : ['AWS_REGION', 'AWS_DEFAULT_REGION']
 ```
 
-`ap-northeast-1` が表示されれば、期待通り。
+regionに`ap-northeast-1` が表示されれば、期待通り。
 
 #### 1.3 事前条件2の確認
 
