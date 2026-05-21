@@ -643,14 +643,16 @@ ASG_INSTANCE_IDS=$(aws autoscaling describe-auto-scaling-groups \
     --output text)
 echo "ASG インスタンス: ${ASG_INSTANCE_IDS}"
 
-# cli-workshop-web-server タグの付いた全インスタンスのうち、ASG 管理外のものを特定
+# 全web-serverインスタンスからASG管理分を除外
 STANDALONE_INSTANCE_ID=$(aws ec2 describe-instances \
     --filters \
         "Name=tag:Name,Values=cli-workshop-web-server" \
         "Name=instance-state-name,Values=running" \
-    --query "Reservations[].Instances[?!contains(\`${ASG_INSTANCE_IDS}\`, InstanceId)].InstanceId" \
+    --query "Reservations[].Instances[].InstanceId" \
     --region ${AWS_REGION} \
-    --output text) && echo "単体 EC2: ${STANDALONE_INSTANCE_ID}"
+    --output text \
+    | tr '\t' '\n' \
+    | grep -v -F -f <(echo "${ASG_INSTANCE_IDS}" | tr '\t' '\n')) && echo "単体 EC2: ${STANDALONE_INSTANCE_ID}"
 ```
 
 > **注意**: 単体 EC2 の ID が正しいことを確認してから、次の手順に進む。
