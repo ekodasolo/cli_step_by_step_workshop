@@ -85,7 +85,7 @@ aws ec2 create-security-group \
     --group-name ${ALB_SG_NAME} \
     --description "${ALB_SG_DESCRIPTION}" \
     --vpc-id ${VPC_ID} \
-    --tag-specifications 'ResourceType=security-group,Tags=[{Key=Name,Value=${ALB_SG_NAME}}]' \
+    --tag-specifications "ResourceType=security-group,Tags=[{Key=Name,Value=${ALB_SG_NAME}}]" \
     --region ${AWS_REGION}
 
 EOF
@@ -99,7 +99,7 @@ aws ec2 create-security-group \
     --group-name ${ALB_SG_NAME} \
     --description "${ALB_SG_DESCRIPTION}" \
     --vpc-id ${VPC_ID} \
-    --tag-specifications 'ResourceType=security-group,Tags=[{Key=Name,Value=${ALB_SG_NAME}}]' \
+    --tag-specifications "ResourceType=security-group,Tags=[{Key=Name,Value=${ALB_SG_NAME}}]" \
     --region ${AWS_REGION}
 ```
 
@@ -318,7 +318,7 @@ aws ec2 create-security-group \
     --group-name ${WEB_SG_NAME} \
     --description "${WEB_SG_DESCRIPTION}" \
     --vpc-id ${VPC_ID} \
-    --tag-specifications 'ResourceType=security-group,Tags=[{Key=Name,Value=${WEB_SG_NAME}}]' \
+    --tag-specifications "ResourceType=security-group,Tags=[{Key=Name,Value=${WEB_SG_NAME}}]" \
     --region ${AWS_REGION}
 
 EOF
@@ -332,7 +332,7 @@ aws ec2 create-security-group \
     --group-name ${WEB_SG_NAME} \
     --description "${WEB_SG_DESCRIPTION}" \
     --vpc-id ${VPC_ID} \
-    --tag-specifications 'ResourceType=security-group,Tags=[{Key=Name,Value=${WEB_SG_NAME}}]' \
+    --tag-specifications "ResourceType=security-group,Tags=[{Key=Name,Value=${WEB_SG_NAME}}]" \
     --region ${AWS_REGION}
 ```
 
