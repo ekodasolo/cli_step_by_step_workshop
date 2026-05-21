@@ -353,7 +353,7 @@ aws ec2 run-instances \
     --security-group-ids ${WEB_SG_ID} \
     --iam-instance-profile Name=${INSTANCE_PROFILE_NAME} \
     --user-data file://userdata.sh \
-    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=${INSTANCE_NAME}}]' \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${INSTANCE_NAME}}]" \
     --region ${AWS_REGION}
 
 EOF
@@ -370,7 +370,7 @@ aws ec2 run-instances \
     --security-group-ids ${WEB_SG_ID} \
     --iam-instance-profile Name=${INSTANCE_PROFILE_NAME} \
     --user-data file://userdata.sh \
-    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=${INSTANCE_NAME}}]' \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${INSTANCE_NAME}}]" \
     --region ${AWS_REGION}
 ```
 
