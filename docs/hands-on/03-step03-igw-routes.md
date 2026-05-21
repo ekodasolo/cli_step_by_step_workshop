@@ -283,7 +283,7 @@ IGW_ID=$(aws ec2 describe-internet-gateways \
 cat << EOF > ${FILE_PARAMETER}
 aws ec2 create-route-table \
     --vpc-id ${VPC_ID} \
-    --tag-specifications 'ResourceType=route-table,Tags=[{Key=Name,Value=${RT_NAME}}]' \
+    --tag-specifications "ResourceType=route-table,Tags=[{Key=Name,Value=${RT_NAME}}]" \
     --region ${AWS_REGION}
 
 EOF
@@ -295,7 +295,7 @@ cat ${FILE_PARAMETER}
 ```bash
 aws ec2 create-route-table \
     --vpc-id ${VPC_ID} \
-    --tag-specifications 'ResourceType=route-table,Tags=[{Key=Name,Value=${RT_NAME}}]' \
+    --tag-specifications "ResourceType=route-table,Tags=[{Key=Name,Value=${RT_NAME}}]" \
     --region ${AWS_REGION}
 ```
 
